@@ -10,4 +10,6 @@ Key features:
 
 Screenshots:
 -------------
-![Screenshot 1](/screenshot/device-2016-12-06-003509.png?raw=true "Title")
+![Screenshot 1](/screenshots/device-2016-12-06-013419.png?raw=true "Main Screen")
+![Screenshot 2](/screenshots/device-2016-12-06-013434.png?raw=true "Graph")
+![Screenshot 3](/screenshots/device-2016-12-06-013444.png?raw=true "Dialog")

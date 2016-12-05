@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Refinancing Rate</string>
+
+    <string name="calendar">Календарь</string>
+    <string name="rate_description">Текущая ставка рефинансирования НБ РБ*:</string>
+    <string name="rate_description_calendar">Cтавка рефинансирования НБ РБ на</string>
+    <string name="attention">* - последнее изменение</string>
+    <string name="dialog_message">Загрузка данных с сервера…</string>
+    <string name="graphic">График</string>
+
+    <string name="error_toast">Ошибка при загрузке, попробуйте снова</string>
+
+    <string name="toast_disable_internet">Нет подключения к интернету</string>
+    <string name="toast_wrong_date">Неверная дата, показан результат на сегодня</string>
+</resources>

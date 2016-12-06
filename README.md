@@ -1,6 +1,6 @@
 # refinancingRate
 
-A useful application that shows the current refinancing rate.
+Useful application that shows the current refinancing rate.
 
 Key features:
 ----------------

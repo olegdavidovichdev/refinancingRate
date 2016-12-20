@@ -10,4 +10,4 @@ Key features:
 
 Screenshots:
 -------------
-![Screenshot 1](/screenshot/device-2016-12-06-003509.png?raw=true "Title")
+![Collage](/screenshots/collage.png?raw=true "Collage")

@@ -1,4 +1,4 @@
-# refinancingRate
+# Refinancing Rate
 
 A useful application that shows the current refinancing rate.
 
@@ -9,5 +9,5 @@ Key features:
 3. Scale graph for details.
 
 Screenshots:
--------------
+----------------
 ![Collage](/screenshots/collage.png?raw=true "Collage")

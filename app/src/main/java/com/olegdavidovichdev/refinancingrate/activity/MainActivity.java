@@ -1,11 +1,7 @@
-package com.example.refinancingrate.activity;
+package com.olegdavidovichdev.refinancingrate.activity;
 
 import android.app.DatePickerDialog;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.os.Build;
-import android.provider.Settings;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -20,12 +16,12 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.refinancingrate.DownloadDialog;
-import com.example.refinancingrate.R;
-import com.example.refinancingrate.model.RefinancingRate;
-import com.example.refinancingrate.network.CheckNetwork;
-import com.example.refinancingrate.rest.ApiClient;
-import com.example.refinancingrate.rest.ApiInterface;
+import com.olegdavidovichdev.refinancingrate.DownloadDialog;
+import com.olegdavidovichdev.refinancingrate.R;
+import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
+import com.olegdavidovichdev.refinancingrate.network.CheckNetwork;
+import com.olegdavidovichdev.refinancingrate.rest.ApiClient;
+import com.olegdavidovichdev.refinancingrate.rest.ApiInterface;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -1,6 +1,6 @@
-package com.example.refinancingrate.rest;
+package com.olegdavidovichdev.refinancingrate.rest;
 
-import com.example.refinancingrate.model.RefinancingRate;
+import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
 
 import java.util.List;
 

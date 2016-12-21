@@ -1,4 +1,4 @@
-package com.example.refinancingrate;
+package com.olegdavidovichdev.refinancingrate;
 
 import org.junit.Test;
 

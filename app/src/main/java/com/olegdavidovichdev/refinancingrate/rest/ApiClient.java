@@ -1,4 +1,4 @@
-package com.example.refinancingrate.rest;
+package com.olegdavidovichdev.refinancingrate.rest;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

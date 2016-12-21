@@ -1,4 +1,4 @@
-package com.example.refinancingrate.model;
+package com.olegdavidovichdev.refinancingrate.model;
 
 import com.google.gson.annotations.SerializedName;
 

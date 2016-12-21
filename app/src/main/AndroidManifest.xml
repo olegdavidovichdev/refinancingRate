@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="internalOnly"
-    package="com.example.refinancingrate">
+    package="com.olegdavidovichdev.refinancingrate">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/MyMaterialTheme">
-        <activity android:name=".activity.MainActivity"
+        <activity android:name="com.olegdavidovichdev.refinancingrate.activity.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.GraphicActivity"
+        <activity android:name="com.olegdavidovichdev.refinancingrate.activity.GraphicActivity"
             android:screenOrientation="landscape"/>
     </application>
 

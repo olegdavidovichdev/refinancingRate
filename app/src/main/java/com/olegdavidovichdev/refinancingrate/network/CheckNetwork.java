@@ -1,4 +1,4 @@
-package com.example.refinancingrate.network;
+package com.olegdavidovichdev.refinancingrate.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

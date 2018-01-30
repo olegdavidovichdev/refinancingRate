@@ -1,12 +1,10 @@
-package com.olegdavidovichdev.refinancingrate;
+package com.olegdavidovichdev.refinancingrate.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.res.Resources;
 
-/**
- * Created by Oleg on 24.11.2016.
- */
+import com.olegdavidovichdev.refinancingrate.R;
+
 
 public class DownloadDialog extends ProgressDialog {
 
@@ -16,15 +14,8 @@ public class DownloadDialog extends ProgressDialog {
         setMessage(context.getResources().getString(R.string.dialog_message));
         setIndeterminate(true);
         setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        setCancelable(false);
 
         show();
     }
-
-    public DownloadDialog(Context context, Resources.Theme theme) {
-        super(context);
-
-
-
-    }
-
 }

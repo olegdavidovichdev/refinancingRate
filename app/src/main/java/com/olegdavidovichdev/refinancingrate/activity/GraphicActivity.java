@@ -13,7 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.olegdavidovichdev.refinancingrate.DownloadDialog;
+import com.olegdavidovichdev.refinancingrate.utils.DownloadDialog;
 import com.olegdavidovichdev.refinancingrate.R;
 import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
 import com.olegdavidovichdev.refinancingrate.network.CheckNetwork;
@@ -31,15 +31,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-
-/**
- * Created by Oleg on 23.11.2016.
- */
 
 public class GraphicActivity extends AppCompatActivity {
 
@@ -60,12 +56,12 @@ public class GraphicActivity extends AppCompatActivity {
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         if (!CheckNetwork.isInternetAvailable(GraphicActivity.this))
-            Toast.makeText(GraphicActivity.this, getResources().getString(R.string.toast_disable_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(GraphicActivity.this, getResources().getString(R.string.disable_internet), Toast.LENGTH_SHORT).show();
         else dialog = new DownloadDialog(this, R.style.ProgressDialogTheme);
 
         ApiInterface apiSecondClient = MainActivity.getApiService();
 
-        Call<List<RefinancingRate>> call = apiSecondClient.getAll("");
+        Call<List<RefinancingRate>> call = apiSecondClient.getAll();
         call.enqueue(new Callback<List<RefinancingRate>>() {
             @Override
             public void onResponse(Call<List<RefinancingRate>> call, Response<List<RefinancingRate>> response) {
@@ -76,7 +72,7 @@ public class GraphicActivity extends AppCompatActivity {
                 final DataPoint[] array = new DataPoint[response.body().size()];
                 int i = 0;
                 for (RefinancingRate r : result) {
-                 //   Log.d(GRAPHIC_TAG, r.getDate() + " " + r.getValue());
+                    //   Log.d(GRAPHIC_TAG, r.getDate() + " " + r.getValue());
                     String strDate = r.getDate();
 
                     Date date = parseStringToDate(strDate);
@@ -87,8 +83,7 @@ public class GraphicActivity extends AppCompatActivity {
                     array[i] = dataPoint;
                     i++;
                 }
-              //  Log.d(GRAPHIC_TAG, Arrays.toString(array));
-
+                //  Log.d(GRAPHIC_TAG, Arrays.toString(array));
 
 
                 LineGraphSeries<DataPoint> series = new LineGraphSeries<>(array);
@@ -122,17 +117,19 @@ public class GraphicActivity extends AppCompatActivity {
                         Log.d(GRAPHIC_TAG, dataPoint.toString() + " " + series);
 
                         Snackbar snackbar = Snackbar.make(coordinatorLayout, "Дата: " + s + "; Ставка рефинансирования: "
-                                         + dataPoint.getY() + "%", Snackbar.LENGTH_LONG);
+                                + dataPoint.getY() + "%", Snackbar.LENGTH_LONG);
                         snackbar.setAction("OK", new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {}
+                            public void onClick(View v) {
+                            }
                         });
 
                         View v = snackbar.getView();
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             v.setBackground(getResources().getDrawable(R.drawable.gradient_background_snackbar, null));
-                        } else v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.snackbar_background));
+                        } else
+                            v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.snackbar_background));
 
                         snackbar.show();
                     }
@@ -149,7 +146,7 @@ public class GraphicActivity extends AppCompatActivity {
             public void onFailure(Call<List<RefinancingRate>> call, Throwable t) {
                 if (dialog != null) dialog.hide();
                 if (CheckNetwork.isInternetAvailable(GraphicActivity.this)) {
-                    Toast.makeText(GraphicActivity.this, getResources().getString(R.string.error_toast), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GraphicActivity.this, getResources().getString(R.string.server_error), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -176,7 +173,7 @@ public class GraphicActivity extends AppCompatActivity {
         graph.getViewport().setXAxisBoundsManual(false);
         graph.getViewport().setYAxisBoundsManual(false);
 
-       // graph.getGridLabelRenderer().setHumanRounding(true);
+        // graph.getGridLabelRenderer().setHumanRounding(true);
 
         graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);

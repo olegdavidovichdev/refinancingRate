@@ -3,13 +3,15 @@
 
     <string name="calendar">Календарь</string>
     <string name="rate_description">Текущая ставка рефинансирования НБ РБ*:</string>
-    <string name="rate_description_calendar">Cтавка рефинансирования НБ РБ на</string>
-    <string name="attention">* - последнее изменение</string>
+    <string name="rate_description_calendar">Cтавка рефинансирования НБ РБ на %1$s*:</string>
+    <string name="attention">* - последнее изменение: %1$s</string>
     <string name="dialog_message">Загрузка данных с сервера…</string>
     <string name="graphic">График</string>
 
-    <string name="error_toast">Ошибка при загрузке, попробуйте снова</string>
+    <string name="server_error">Ошибка при загрузке, попробуйте снова</string>
 
-    <string name="toast_disable_internet">Нет подключения к интернету</string>
+    <string name="disable_internet">Нет подключения к интернету</string>
     <string name="toast_wrong_date">Неверная дата, показан результат на сегодня</string>
+    <string name="rates_list_is_empty">Не удалось загрузить данные для выбранной даты</string>
+    <string name="convert_error">Не удалось форматировать данные. Возможно, произошли изменения на сервере.</string>
 </resources>

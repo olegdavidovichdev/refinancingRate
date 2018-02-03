@@ -12,7 +12,7 @@ import retrofit2.http.Query;
 public interface ApiInterface {
 
     @GET("RefinancingRate")
-    Call<List<RefinancingRate>> getRefinancingRateOnDay (@Query("onDate") String date);
+    Call<List<RefinancingRate>> getRefinancingRateOnDay(@Query("onDate") String date);
 
     @GET("RefinancingRate")
     Call<List<RefinancingRate>> getAll();

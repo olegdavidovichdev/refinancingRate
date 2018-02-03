@@ -2,8 +2,10 @@ package com.olegdavidovichdev.refinancingrate.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,27 +15,31 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.olegdavidovichdev.refinancingrate.utils.ConvertErrorListener;
-import com.olegdavidovichdev.refinancingrate.utils.OnDateSetListenerImpl;
-import com.olegdavidovichdev.refinancingrate.utils.DownloadDialog;
-import com.olegdavidovichdev.refinancingrate.rest.LoadingListener;
-import com.olegdavidovichdev.refinancingrate.rest.RefinancingRateCallback;
 import com.olegdavidovichdev.refinancingrate.R;
-import com.olegdavidovichdev.refinancingrate.rest.RequestListener;
+import com.olegdavidovichdev.refinancingrate.RefRateHandler;
+import com.olegdavidovichdev.refinancingrate.UpdateViewListener;
 import com.olegdavidovichdev.refinancingrate.entity.TimeRepository;
 import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
 import com.olegdavidovichdev.refinancingrate.network.CheckNetwork;
 import com.olegdavidovichdev.refinancingrate.rest.ApiClient;
 import com.olegdavidovichdev.refinancingrate.rest.ApiInterface;
+import com.olegdavidovichdev.refinancingrate.rest.LoadingListener;
+import com.olegdavidovichdev.refinancingrate.rest.RefinancingRateCallback;
+import com.olegdavidovichdev.refinancingrate.rest.RequestListener;
+import com.olegdavidovichdev.refinancingrate.utils.ConvertErrorListener;
 import com.olegdavidovichdev.refinancingrate.utils.DateFormatter;
+import com.olegdavidovichdev.refinancingrate.utils.DownloadDialog;
+import com.olegdavidovichdev.refinancingrate.utils.OnDateSetListenerImpl;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 
-public class MainActivity extends AppCompatActivity implements LoadingListener, RequestListener, ConvertErrorListener {
+public class MainActivity extends AppCompatActivity implements LoadingListener,
+        RequestListener, ConvertErrorListener, UpdateViewListener {
 
     private static ApiInterface apiService;
 
@@ -44,10 +50,10 @@ public class MainActivity extends AppCompatActivity implements LoadingListener, 
 
     private DownloadDialog dialog;
 
-    private double counter;
-
     private TimeRepository timeRepository;
     private RefinancingRateCallback refinancingRateCallback;
+    private Handler refRateHandler;
+    private DecimalFormat df;
 
 
     @Override
@@ -72,51 +78,6 @@ public class MainActivity extends AppCompatActivity implements LoadingListener, 
             onLoad();
         }
     }
-
-    private void setCounterValue(final double val) {
-
-        double temp = 1500 / (val * 4);
-        final long sleepTime = (long) temp;
-
-        Thread counterThread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    for (counter = 0; counter < val; counter += 0.25) {
-                        Thread.sleep(sleepTime);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refinancingRate.setText(counter + "%");
-                            }
-                        });
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        counterThread.start();
-
-    }
-
-    public static ApiInterface getApiService() {
-        return apiService;
-    }
-
-    private void setAnimationRate() {
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.refinancing_rate_animation);
-        refinancingRate.startAnimation(animation);
-    }
-
-    private void setAnimationAttention() {
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.attention_animation);
-        attention.startAnimation(animation);
-    }
-
 
     private void setToolbarTitle(String current) {
         setSupportActionBar(toolbar);
@@ -155,10 +116,38 @@ public class MainActivity extends AppCompatActivity implements LoadingListener, 
         return super.onOptionsItemSelected(item);
     }
 
+    private void setCounterValue(double val) {
+        if (refRateHandler == null) {
+            refRateHandler = new RefRateHandler(this);
+        }
+
+        if (df == null) {
+            df = new DecimalFormat(".00");
+        }
+
+        double temp = 6000 / (val * 4);
+        long sleepTime = (long) temp;
+
+        for (double counter = 0; counter <= val; counter += 0.25) {
+            Message message = refRateHandler.obtainMessage(0, df.format(counter));
+            refRateHandler.sendMessageDelayed(message, (long) (sleepTime * counter));
+        }
+    }
+
+    private void setAnimationRate() {
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.refinancing_rate_animation);
+        refinancingRate.startAnimation(animation);
+    }
+
+    private void setAnimationAttention() {
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.attention_animation);
+        attention.startAnimation(animation);
+    }
+
     @Override
     public void onLoad() {
         if (apiService == null) {
-            apiService = ApiClient.getClient().create(ApiInterface.class);
+            apiService = ApiClient.getApiService();
         }
 
         Call<List<RefinancingRate>> call =
@@ -216,4 +205,12 @@ public class MainActivity extends AppCompatActivity implements LoadingListener, 
     public void onConvertError() {
         Toast.makeText(this, getString(R.string.convert_error), Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onUpdateView(String value) {
+        if (refinancingRate != null) {
+            refinancingRate.setText(value + "%");
+        }
+    }
+
 }

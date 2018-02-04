@@ -14,4 +14,5 @@
     <string name="toast_wrong_date">Неверная дата, показан результат на сегодня</string>
     <string name="rates_list_is_empty">Не удалось загрузить данные для выбранной даты</string>
     <string name="convert_error">Не удалось форматировать данные. Возможно, произошли изменения на сервере.</string>
+    <string name="snackbar">Дата: %1$s; Ставка рефинансирования: %2$s%%</string>
 </resources>

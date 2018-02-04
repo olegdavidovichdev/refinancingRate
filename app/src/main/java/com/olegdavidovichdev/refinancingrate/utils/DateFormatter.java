@@ -20,7 +20,7 @@ public class DateFormatter {
     }
 
 
-    public static String convert(String pattern, String date, ConvertErrorListener listener)  {
+    public static String convertToString(String pattern, String date, ConvertErrorListener listener)  {
         SimpleDateFormat initSDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", LocaleBY.getLocaleBY());
         Date d = null;
         try {
@@ -30,6 +30,18 @@ public class DateFormatter {
         }
         SimpleDateFormat sdf = new SimpleDateFormat(pattern, LocaleBY.getLocaleBY());
         return sdf.format(d);
+    }
+
+    public static Date convertToDate(String date, ConvertErrorListener listener)  {
+        SimpleDateFormat initSDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", LocaleBY.getLocaleBY());
+        Date d = null;
+        try {
+            d = initSDF.parse(date);
+        } catch (ParseException e) {
+            listener.onConvertError();
+        }
+
+        return d;
     }
 
     public static boolean compareTodayWithCurrent(long today, long current) {

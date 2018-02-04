@@ -9,151 +9,130 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.olegdavidovichdev.refinancingrate.utils.DownloadDialog;
-import com.olegdavidovichdev.refinancingrate.R;
-import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
-import com.olegdavidovichdev.refinancingrate.network.CheckNetwork;
-import com.olegdavidovichdev.refinancingrate.rest.ApiInterface;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.OnDataPointTapListener;
-import com.jjoe64.graphview.series.Series;
+import com.olegdavidovichdev.refinancingrate.OnDataPointTapListenerImpl;
+import com.olegdavidovichdev.refinancingrate.R;
+import com.olegdavidovichdev.refinancingrate.SnackListener;
+import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
+import com.olegdavidovichdev.refinancingrate.network.CheckNetwork;
+import com.olegdavidovichdev.refinancingrate.rest.ApiClient;
+import com.olegdavidovichdev.refinancingrate.rest.ApiInterface;
+import com.olegdavidovichdev.refinancingrate.rest.LoadingListener;
+import com.olegdavidovichdev.refinancingrate.rest.RefinancingRateCallback;
+import com.olegdavidovichdev.refinancingrate.rest.RequestListener;
+import com.olegdavidovichdev.refinancingrate.utils.ConvertErrorListener;
+import com.olegdavidovichdev.refinancingrate.utils.DateFormatter;
+import com.olegdavidovichdev.refinancingrate.utils.DownloadDialog;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
-public class GraphicActivity extends AppCompatActivity {
+public class GraphicActivity extends AppCompatActivity implements LoadingListener, RequestListener,
+        ConvertErrorListener, SnackListener, View.OnClickListener {
 
-    private static final String GRAPHIC_TAG = "tagGraphic";
+    private static ApiInterface apiService;
 
-    private CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.graph) GraphView graph;
+    @BindView(R.id.coordinatorLayout) CoordinatorLayout coordinatorLayout;
+
     private DownloadDialog dialog;
-    private GraphView graph;
+    private RefinancingRateCallback refinancingRateCallback;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_graphic);
+        ButterKnife.bind(this);
 
-        graph = (GraphView) findViewById(R.id.graph);
         graph.setVisibility(View.INVISIBLE);
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-
-        if (!CheckNetwork.isInternetAvailable(GraphicActivity.this))
+        if (!CheckNetwork.isInternetAvailable(GraphicActivity.this)) {
             Toast.makeText(GraphicActivity.this, getResources().getString(R.string.disable_internet), Toast.LENGTH_SHORT).show();
-        else dialog = new DownloadDialog(this, R.style.ProgressDialogTheme);
-
-        ApiInterface apiSecondClient = MainActivity.getApiService();
-
-        Call<List<RefinancingRate>> call = apiSecondClient.getAll();
-        call.enqueue(new Callback<List<RefinancingRate>>() {
-            @Override
-            public void onResponse(Call<List<RefinancingRate>> call, Response<List<RefinancingRate>> response) {
-                dialog.hide();
-                graph.setVisibility(View.VISIBLE);
-                List<RefinancingRate> result = response.body();
-
-                final DataPoint[] array = new DataPoint[response.body().size()];
-                int i = 0;
-                for (RefinancingRate r : result) {
-                    //   Log.d(GRAPHIC_TAG, r.getDate() + " " + r.getValue());
-                    String strDate = r.getDate();
-
-                    Date date = parseStringToDate(strDate);
-                    Log.d(GRAPHIC_TAG, "date.getTime()" + date.getTime());
-                    double value = r.getValue();
-
-                    DataPoint dataPoint = new DataPoint(date, value);
-                    array[i] = dataPoint;
-                    i++;
-                }
-                //  Log.d(GRAPHIC_TAG, Arrays.toString(array));
-
-
-                LineGraphSeries<DataPoint> series = new LineGraphSeries<>(array);
-
-
-                graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(GraphicActivity.this));
-
-                series.setDataPointsRadius(8);
-                series.setDrawDataPoints(true);
-                series.setAnimated(true);
-                series.setDrawBackground(true);
-                series.setBackgroundColor(Color.argb(50, 200, 200, 200));
-
-
-                Paint paint = new Paint();
-                paint.setStrokeWidth(6);
-                paint.setAntiAlias(true);
-                paint.setColor(Color.WHITE);
-                paint.setDither(true);
-                paint.setFilterBitmap(true);
-                series.setCustomPaint(paint);
-
-                series.setOnDataPointTapListener(new OnDataPointTapListener() {
-                    @Override
-                    public void onTap(Series series, DataPointInterface dataPoint) {
-                        double temp = dataPoint.getX();
-                        long longo = (long) temp;
-                        Date d = new Date(longo);
-                        String s = new SimpleDateFormat("dd-MM-yyyy").format(d);
-
-                        Log.d(GRAPHIC_TAG, dataPoint.toString() + " " + series);
-
-                        Snackbar snackbar = Snackbar.make(coordinatorLayout, "Дата: " + s + "; Ставка рефинансирования: "
-                                + dataPoint.getY() + "%", Snackbar.LENGTH_LONG);
-                        snackbar.setAction("OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                            }
-                        });
-
-                        View v = snackbar.getView();
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            v.setBackground(getResources().getDrawable(R.drawable.gradient_background_snackbar, null));
-                        } else
-                            v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.snackbar_background));
-
-                        snackbar.show();
-                    }
-                });
-
-                configGridLabelFormatter();
-
-                graph.getViewport().setMinX(array[0].getX());
-                graph.getViewport().setMaxX(array[array.length - 1].getX());
-                graph.addSeries(series);
-            }
-
-            @Override
-            public void onFailure(Call<List<RefinancingRate>> call, Throwable t) {
-                if (dialog != null) dialog.hide();
-                if (CheckNetwork.isInternetAvailable(GraphicActivity.this)) {
-                    Toast.makeText(GraphicActivity.this, getResources().getString(R.string.server_error), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        } else {
+            dialog = new DownloadDialog(this, R.style.ProgressDialogTheme);
+            onLoad();
+        }
     }
 
-    private void configGridLabelFormatter() {
+    @Override
+    public void onLoad() {
+        if (apiService == null) {
+            apiService = ApiClient.getApiService();
+        }
 
+        Call<List<RefinancingRate>> call = apiService.getAll();
+
+        if (refinancingRateCallback == null) {
+            refinancingRateCallback = new RefinancingRateCallback(this);
+        }
+
+        dialog.show();
+        call.enqueue(refinancingRateCallback);
+    }
+
+    @Override
+    public void onSuccess(List<RefinancingRate> listOfRates) {
+        if (dialog != null) {
+            dialog.hide();
+        }
+
+        DataPoint[] array = new DataPoint[listOfRates.size()];
+        for (int i = 0; i < listOfRates.size(); i++) {
+            RefinancingRate r = listOfRates.get(i);
+
+            Date date = DateFormatter.convertToDate(r.getDate(), this);
+
+            double value = r.getValue();
+
+            DataPoint dataPoint = new DataPoint(date, value);
+            array[i] = dataPoint;
+        }
+
+        setUpGraph(array);
+    }
+
+    private void setUpGraph(DataPoint[] array) {
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(array);
+
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(GraphicActivity.this));
+
+        series.setDataPointsRadius(8);
+        series.setDrawDataPoints(true);
+        series.setAnimated(true);
+        series.setDrawBackground(true);
+        series.setBackgroundColor(Color.argb(50, 200, 200, 200));
+
+        Paint paint = new Paint();
+        paint.setStrokeWidth(6);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
+        paint.setDither(true);
+        paint.setFilterBitmap(true);
+        series.setCustomPaint(paint);
+
+        series.setOnDataPointTapListener(new OnDataPointTapListenerImpl(this));
+
+        configGridLabelRenderer();
+        configViewport();
+
+        graph.getViewport().setMinX(array[0].getX());
+        graph.getViewport().setMaxX(array[array.length - 1].getX());
+        graph.addSeries(series);
+        graph.setVisibility(View.VISIBLE);
+    }
+
+    private void configGridLabelRenderer() {
         graph.getGridLabelRenderer().setNumVerticalLabels(6);
         graph.getGridLabelRenderer().setNumHorizontalLabels(7);
         graph.getGridLabelRenderer().setTextSize(20);
@@ -168,13 +147,11 @@ public class GraphicActivity extends AppCompatActivity {
         // label x and y color
         graph.getGridLabelRenderer().setHorizontalLabelsColor(ContextCompat.getColor(GraphicActivity.this, R.color.colorAccent));
         graph.getGridLabelRenderer().setVerticalLabelsColor(ContextCompat.getColor(GraphicActivity.this, R.color.colorAccent));
+    }
 
-
+    private void configViewport() {
         graph.getViewport().setXAxisBoundsManual(false);
         graph.getViewport().setYAxisBoundsManual(false);
-
-        // graph.getGridLabelRenderer().setHumanRounding(true);
-
         graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
         graph.getViewport().setDrawBorder(true);
@@ -187,15 +164,42 @@ public class GraphicActivity extends AppCompatActivity {
         graph.getViewport().setBorderPaint(viewPortPaint);
     }
 
-    private Date parseStringToDate(String responseString) {
+    @Override
+    public void onFailure(String message) {
+        if (dialog != null) dialog.hide();
+        if (CheckNetwork.isInternetAvailable(GraphicActivity.this)) {
+            Toast.makeText(GraphicActivity.this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
 
-        int year = Integer.parseInt(responseString.substring(0, 4));
-        int month = Integer.parseInt(responseString.substring(5, 7));
-        int day = Integer.parseInt(responseString.substring(8, 10));
-        Log.d(GRAPHIC_TAG, year + " " + month + " " + day);
+    @Override
+    public void onConvertError() {
+        Toast.makeText(this, getString(R.string.convert_error), Toast.LENGTH_LONG).show();
+    }
 
-        Calendar calendar = new GregorianCalendar(year, month - 1, day);
+    @Override
+    public void onSnackbarShow(String date, String rate) {
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.snackbar, date, rate),
+                Snackbar.LENGTH_LONG);
+        snackbar.setAction("OK", this);
 
-        return calendar.getTime();
+        setCustomSnackbarBackground(snackbar);
+
+        snackbar.show();
+    }
+
+    private void setCustomSnackbarBackground(Snackbar snackbar) {
+        View snackbarBackground = snackbar.getView();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            snackbarBackground.setBackground(getResources().getDrawable(R.drawable.gradient_background_snackbar, null));
+        } else {
+            snackbarBackground.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.snackbar_background));
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        // ignored
     }
 }

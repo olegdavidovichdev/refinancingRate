@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements LoadingListener,
     }
 
     @Override
-    public void onSuccess(RefinancingRate rate) {
+    public void onSuccess(List<RefinancingRate> listOfRates) {
         if (dialog != null) {
             dialog.hide();
         }
@@ -179,12 +179,12 @@ public class MainActivity extends AppCompatActivity implements LoadingListener,
 
 
         // rate
-        setCounterValue(rate.getValue());
+        setCounterValue(listOfRates.get(0).getValue());
         setAnimationRate();
 
         // attention
         attention.setText(getResources().getString(R.string.attention,
-                DateFormatter.convert("dd-MM-yyyy", rate.getDate(), this)));
+                DateFormatter.convertToString("dd-MM-yyyy", listOfRates.get(0).getDate(), this)));
         setAnimationAttention();
     }
 

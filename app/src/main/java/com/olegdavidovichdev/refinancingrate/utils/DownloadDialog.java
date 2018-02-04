@@ -15,7 +15,6 @@ public class DownloadDialog extends ProgressDialog {
         setIndeterminate(true);
         setProgressStyle(ProgressDialog.STYLE_SPINNER);
         setCancelable(false);
-
-        show();
     }
+
 }

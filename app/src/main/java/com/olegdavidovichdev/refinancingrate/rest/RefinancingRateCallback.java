@@ -2,7 +2,6 @@ package com.olegdavidovichdev.refinancingrate.rest;
 
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.olegdavidovichdev.refinancingrate.R;
 import com.olegdavidovichdev.refinancingrate.model.RefinancingRate;
@@ -31,8 +30,7 @@ public class RefinancingRateCallback implements Callback<List<RefinancingRate>> 
     public void onResponse(Call<List<RefinancingRate>> call, Response<List<RefinancingRate>> response) {
         if (response.isSuccessful()) {
             if (!response.body().isEmpty()) {
-                RefinancingRate rateOnThisDay = response.body().get(0);
-                listener.onSuccess(rateOnThisDay);
+                listener.onSuccess(response.body());
             } else {
                 listener.onFailure(context.getResources().getString(R.string.rates_list_is_empty));
             }
@@ -45,4 +43,5 @@ public class RefinancingRateCallback implements Callback<List<RefinancingRate>> 
     public void onFailure(Call<List<RefinancingRate>> call, Throwable t) {
         listener.onFailure(t.getMessage());
     }
+
 }
